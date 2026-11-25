@@ -1,128 +1,77 @@
-# bl_app_dbb_AntsCTSeg
+<h1 align="center">DBB_ANTsCortThickSeg</h1>
 
-This application implements a custumed version of [_AntsCorticalThickness.sh_ ](https://github.com/ANTsX/ANTs/blob/master/Scripts/antsCorticalThickness.sh) script of the ANTs toolkit [(Avants et al., 2011)](https://doi.org/10.1016/j.neuroimage.2010.09.025
-), using [PTBP priors](https://figshare.com/articles/dataset/The_Pediatric_Template_of_Brain_Perfusion_PTBP_/923555)  and  a brain mask  to obtain the brain tissue segmentation.
+<p align="center">
+  Segments brain tissues in a T1-weighted image with a customized ANTs antsCorticalThickness.sh using Pediatric Template of Brain Perfusion (PTBP) priors and an optional brain mask, and outputs a tissue segmentation.
+</p>
 
-### Author
+<p align="center">
+  <a href="https://github.com/brainlife/abcd-spec"><img src="https://img.shields.io/badge/ABCD_Spec-v1.1-green.svg" alt="ABCD Spec v1.1"></a>
+  <a href="https://doi.org/10.25663/brainlife.app.541"><img src="https://img.shields.io/badge/Brainlife-brainlife.app.541-blue.svg" alt="Run on brainlife.io"></a>
+</p>
 
-    Gabriele Amorosino (gamorosino@fbk.eu)
+## At a glance
 
-### Citation
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
 
-If you use this code for your research please cite:
+> **Segments brain tissues in a T1-weighted image with a customized ANTs antsCorticalThickness.sh using Pediatric Template of Brain Perfusion (PTBP) priors and an optional brain mask, and outputs a tissue segmentation.**
 
-```
-Gabriele Amorosino, Denis Peruzzo, Daniela Redaelli, Emanuele Olivetti, Filippo Arrigoni, Paolo Avesani,
-DBB - A Distorted Brain Benchmark for Automatic Tissue Segmentation in Paediatric Patients,
-NeuroImage, 2022, 119486, ISSN 1053-8119, https://doi.org/10.1016/j.neuroimage.2022.119486.
-```
+Runs stages 1-3 of a customized antsCorticalThickness.sh (ANTs 2.2.0) with the PTBP template and six tissue priors bundled in the repo; when a brain mask is given it replaces the template-based brain extraction. Developed for the Distorted Brain Benchmark (DBB) of paediatric patients with brain malformations. It needs a T1w image; the output is the ANTs BrainSegmentation volume with a label.json.
 
-## Running the Brainlife App
+| | |
+|---|---|
+| **Inputs** | `neuro/anat/t1w` · `neuro/mask` (optional) |
+| **Outputs** | `neuro/parcellation/volume` |
+| **Container** | `brainlife/ants:2.2.0-1bc` |
+| **Resources** | 10 CPUs |
+| **Run it** | [doi.org/10.25663/brainlife.app.541](https://doi.org/10.25663/brainlife.app.541) |
 
+#### Inputs
 
-You can run the BrainLife App `DBB_ANTsCortThickSeg` on the brainlife.io platform via the web user interface (UI) or using the `brainlife CLI`.  With both of these two solutions, the inputs and outputs are stored on the brainlife.io platform, under the specified project, and the computations are performed using the brainlife.io cloud computing resources.
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `t1` | `neuro/anat/t1w` | yes | T1-weighted image to segment. |
+| `mask` | `neuro/mask` | no | Optional brain mask used instead of the template-based brain extraction. Must be in the same space as the T1. |
 
+#### Outputs
 
-### On Brainlife.io via UI
+| Output | Datatype | Description |
+|---|---|---|
+| `segmentation` | `neuro/parcellation/volume` | Brain tissue segmentation (segmentation.nii.gz, ANTs BrainSegmentation) with label.json. |
 
-You can see _DBB_ANTsCortThickSeg_ currently registered on Brainlife. Find the App on _brainlife.io_ and click "Execute" tab and specify dataset e.g. "DBB Distorted Brain Benchmark".
+<!-- brainlife-app:end -->
 
-### On Brainlife.io using CLI
+## Running the App
 
-Brainlife CLI could be installed on UNIX/Linux-based system following the instruction reported in https://brainlife.io/docs/cli/install/.
+### On brainlife.io
 
-The first time you use the _BrainLife_ _CLI_ on a machine, you need to log in with the brainlife.io credentials
+Open the App at [doi.org/10.25663/brainlife.app.541](https://doi.org/10.25663/brainlife.app.541), choose `neuro/anat/t1w`, `neuro/mask` from your project and press **Execute**. The results are saved to your project as `neuro/parcellation/volume`.
 
-```
-bl login
-```
+### Locally
 
-You can run the App with CLI as follow:
-```
-bl app run --id   60ef07acddc2dff22965f239  --project <project_id> --input t1:<t1_object_id> --input mask:<mask_object_id> 
-```
-the output is stored in the reference project specified with the id ```<project_id>```. You can retrieve the _object_id_ using the command ```bl data query```, e.g to get the id of the mask file for the subject _0001_ :
-```
-bl data query --subject 0001 --datatype neuro/mask --project <projectid>
-```
+You need [Singularity/Apptainer](https://apptainer.org/) (the App runs in `brainlife/ants:2.2.0-1bc`), [`jq`](https://jqlang.github.io/jq/).
 
-If not present yet, you can upload a new file in a project using ```bl data upload```. For example, in the case of T1-w file, for the subject 0001 you can run:
-```
-bl data upload --project <project_id> --subject 0001 --datatype "neuro/anat/t1w" --t1 <full_path>
+1. Clone this repository.
+2. Create `config.json` with the paths to your inputs and the parameters:
 
-```
-## Running the code locally
+   ```json
+   {
+       "t1": "/path/to/t1/t1",
+       "mask": "/path/to/mask/mask"
+   }
+   ```
 
-You can run the code on your local machine by git cloning this repository. You can choose to run it with _dockers_, avoiding to install any software except for [singularity](https://sylabs.io/). Furthermore, you can run the original script using local software installed.
+3. Run `./main`.
 
-### Run the script using the dockers (recommended)
+## Citing
 
-It is possible to run the app locally, using the dockers that embedded all needed software. This is exactly the same way that apps run code on brainlife.io
+If you use this App, please cite it, the software it builds on and brainlife.io:
 
-Inside the cloned directory, create `config.json` with something like the following content with the fullpaths to your local input files:
-```
-{   
-    "t1": "./t1.nii.gz",
-    "mask": "./mask.nii.gz"
-}
-```
+- DBB_ANTsCortThickSeg. brainlife.io App. [doi:10.25663/brainlife.app.541](https://doi.org/10.25663/brainlife.app.541)
+- Amorosino G, Peruzzo D, Redaelli D, Olivetti E, Arrigoni F, Avesani P. DBB - A Distorted Brain Benchmark for Automatic Tissue Segmentation in Paediatric Patients. NeuroImage 119486 (2022). [doi:10.1016/j.neuroimage.2022.119486](https://doi.org/10.1016/j.neuroimage.2022.119486)
+- Avants et al. A reproducible evaluation of ANTs similarity metric performance in brain image registration. *NeuroImage* 54:2033-2044 (2011). [doi:10.1016/j.neuroimage.2010.09.025](https://doi.org/10.1016/j.neuroimage.2010.09.025)
+- Hayashi S, Caron BA, Heinsfeld AS, et al. brainlife.io: a decentralized and open-source cloud platform to support neuroscience research. *Nature Methods* 21:809–813 (2024). [doi:10.1038/s41592-024-02237-2](https://doi.org/10.1038/s41592-024-02237-2)
+- Avesani P, McPherson B, Hayashi S, et al. The open diffusion data derivatives, brain data upcycling via integrated publishing of derivatives and reproducible open cloud services. *Scientific Data* 6:69 (2019). [doi:10.1038/s41597-019-0073-y](https://doi.org/10.1038/s41597-019-0073-y)
 
-Launch the app by executing `main`.
-```
-./main
-```
-To avoid using the config file, you can input directly the fullpath of the filess using the script ```main.sh```:
+## Authors
 
-```
-main.sh <t1.ext> <mask.ext> [<outputdir>]
-```
-
-#### Script Dependecies
-
-The App needs   `singularity` to run.
-
-#### Output
-
-The output of _bl_app_dbb_ANTnCTSeg_ are the predicted segmentation volume of the 3D U-Net and a json file describing the labels of the segmented volume.         
-
-The files are stored in the working directory, under the folder _./segmentation_  with the name _segmentation.nii.gz_ , for the semgnetaion volume and _label.json_, for the json file.
-
-### Run the script (local installed softwares) 
-
-Clone this repository using git on your local machine to run this script.
-
-### Usage
-
-
-```
-
-main_local.sh <t1.ext> <mask.ext> [<outputdir>]
-
-```
-
-#### Output
-
-The outputs of bl_app_dbb_DisSeg are the predicted segmentation volume of the 3D U-Net and a json file describing the labels of the segmented volume.         
-
-The files are stored in the working directory, under the folder _./segmentation_  with the name _segmentation.nii.gz_ , for the semgnetaion volume and _label.json_, for the json file.
-
-
-####  Script Dependecies
-
-In order to use the script, the following software must be installed:
-* ANTs, Advanced Normalization Tools (version >= 2.1.0)
-
-
-## Run test on DBB Distorted Brain Benchmark test set
-
-You can run the tool to reproduce the results on the test set of DBB Distorted Brain Benchmark using the script with dockers:
-```
-run_test.sh <download_dir> <output_dir>
-```
-or with local softwares installed:
-
-```
-run_test_local.sh <download_dir> <output_dir>
-```
-The script performs the automatic download of the published testset (using [`brainlife CLI`](https://brainlife.io/docs/cli/install/)) of the DBB benchmark (https://doi.org/10.25663/brainlife.pub.24) in the folder ```<download_dir>```. Then, the script computes the segmentation volume for each subject and stores the results in ```<output_dir>```. 
-Finally, the script computes the dice score between the estimated segmentation and the test set ground-truth, and create the final _csv_ file, _average_dice_score.csv_ (stored in ```<output_dir>```), reporting the average dice score across the subjects for each label of the segmented volumes.
+Gabriele Amorosino
