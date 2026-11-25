@@ -1,5 +1,37 @@
 # bl_app_dbb_AntsCTSeg
 
+<!-- brainlife-app:begin (generated from the App manifest; edit the manifest, not this block) -->
+
+> **Segments brain tissues in a T1-weighted image with a customized ANTs antsCorticalThickness.sh using Pediatric Template of Brain Perfusion (PTBP) priors and an optional brain mask, and outputs a tissue segmentation.**
+
+Runs stages 1-3 of a customized antsCorticalThickness.sh (ANTs 2.2.0) with the PTBP template and six tissue priors bundled in the repo; when a brain mask is given it replaces the template-based brain extraction. Developed for the Distorted Brain Benchmark (DBB) of paediatric patients with brain malformations. It needs a T1w image; the output is the ANTs BrainSegmentation volume with a label.json.
+
+| | |
+|---|---|
+| 📥 **Inputs** | `neuro/anat/t1w` · `neuro/mask` (optional) |
+| 📤 **Outputs** | `neuro/parcellation/volume` |
+| 🐳 **Container** | `brainlife/ants:2.2.0-1bc` |
+| ⚙️ **Resources** | 10 CPUs |
+| 🔗 **Run it** | [doi.org/10.25663/brainlife.app.541](https://doi.org/10.25663/brainlife.app.541) |
+
+#### 📥 Inputs
+
+| Input | Datatype | Required | Description |
+|---|---|---|---|
+| `t1` | `neuro/anat/t1w` | yes | T1-weighted image to segment. |
+| `mask` | `neuro/mask` | no | Optional brain mask used instead of the template-based brain extraction. Must be in the same space as the T1. |
+
+#### 📤 Outputs
+
+| Output | Datatype | Description |
+|---|---|---|
+| `segmentation` | `neuro/parcellation/volume` | Brain tissue segmentation (segmentation.nii.gz, ANTs BrainSegmentation) with label.json. |
+
+📚 **References used by this App:**
+- Amorosino G, Peruzzo D, Redaelli D, Olivetti E, Arrigoni F, Avesani P. DBB - A Distorted Brain Benchmark for Automatic Tissue Segmentation in Paediatric Patients. NeuroImage 119486 (2022). [doi:10.1016/j.neuroimage.2022.119486](https://doi.org/10.1016/j.neuroimage.2022.119486)
+
+<!-- brainlife-app:end -->
+
 This application implements a custumed version of [_AntsCorticalThickness.sh_ ](https://github.com/ANTsX/ANTs/blob/master/Scripts/antsCorticalThickness.sh) script of the ANTs toolkit [(Avants et al., 2011)](https://doi.org/10.1016/j.neuroimage.2010.09.025
 ), using [PTBP priors](https://figshare.com/articles/dataset/The_Pediatric_Template_of_Brain_Perfusion_PTBP_/923555)  and  a brain mask  to obtain the brain tissue segmentation.
 
